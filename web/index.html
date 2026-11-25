@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PaperFetch — Open-Access Paper Downloader</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/" id="brand-home" aria-label="PaperFetch home">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-name">PaperFetch</span>
+      </a>
+      <div class="topbar-meta">
+        <span class="pill-note">OpenAlex · Unpaywall · Crossref · Europe PMC · Semantic Scholar</span>
+      </div>
+    </header>
+
+    <main>
+      <!-- UPLOAD VIEW -->
+      <section id="view-upload" class="view is-active">
+        <div class="hero">
+          <div class="hero-copy">
+            <p class="eyebrow">Systematic review toolkit</p>
+            <h1 class="brand-hero">Download free research papers in one click.</h1>
+            <p class="lede">
+              Add your Excel or CSV paper list and run. PaperFetch finds and downloads
+              all legally open-access PDFs, counts <strong>Total</strong>,
+              <strong>Downloaded</strong>, and <strong>Not Found</strong>, and exports
+              a detailed <strong>Excel report</strong> explaining why any missing paper
+              could not be downloaded.
+            </p>
+
+            <form id="upload-form" class="upload-panel" novalidate>
+              <label id="dropzone" class="dropzone" for="file-input">
+                <input
+                  id="file-input"
+                  name="file"
+                  type="file"
+                  accept=".xlsx,.xlsm,.xls,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv"
+                />
+                <div class="dropzone-inner">
+                  <div class="dropzone-badge" aria-hidden="true">XLSX</div>
+                  <div>
+                    <strong id="dropzone-title">Drop your Excel or CSV file here</strong>
+                    <span id="dropzone-sub">or click to browse · .xlsx, .xlsm, .xls, .csv</span>
+                  </div>
+                </div>
+              </label>
+
+              <div class="field-grid">
+                <label class="field">
+                  <span>Contact email</span>
+                  <input
+                    id="email-input"
+                    name="email"
+                    type="email"
+                    placeholder="researcher@gmail.com"
+                    required
+                    autocomplete="email"
+                  />
+                  <small id="email-hint">Required by OpenAlex / Unpaywall polite pool (avoid @example.com)</small>
+                </label>
+
+                <label class="field">
+                  <span>Limit (optional)</span>
+                  <input
+                    id="limit-input"
+                    name="limit"
+                    type="number"
+                    min="0"
+                    step="1"
+                    placeholder="All papers"
+                  />
+                  <small>Leave blank to process the entire sheet</small>
+                </label>
+              </div>
+
+              <label class="check">
+                <input id="dry-run-input" name="dry_run" type="checkbox" />
+                <span>Dry run — check open-access availability and build the Excel report without downloading PDFs</span>
+              </label>
+
+              <div class="actions">
+                <button id="start-btn" type="submit" class="btn btn-primary">
+                  Run &amp; Download Papers
+                </button>
+                <p id="form-error" class="form-error" hidden></p>
+              </div>
+            </form>
+          </div>
+
+          <aside class="hero-card" aria-label="What you get">
+            <h2 class="card-heading">What PaperFetch outputs</h2>
+            <ul class="feature-list">
+              <li>
+                <span class="dot dot-ok"></span>
+                <div>
+                  <strong>All Free OA PDFs (ZIP)</strong>
+                  <p>Validated real PDFs sorted into publisher folders (IEEE, Springer, Nature, Elsevier, PubMed, MDPI, ACM, Wiley).</p>
+                </div>
+              </li>
+              <li>
+                <span class="dot dot-accent"></span>
+                <div>
+                  <strong>Live Counts</strong>
+                  <p>Instant counters for <em>Total</em>, <em>Downloaded</em>, and <em>Not Found</em> with exact breakdown.</p>
+                </div>
+              </li>
+              <li>
+                <span class="dot dot-warn"></span>
+                <div>
+                  <strong>Excel Report (.xlsx)</strong>
+                  <p>Multi-sheet workbook: Summary, All Papers, Downloaded, and Not Downloaded with the exact <em>Reason Why Not</em> &amp; clickable links.</p>
+                </div>
+              </li>
+            </ul>
+          </aside>
+        </div>
+      </section>
+
+      <!-- PROGRESS VIEW -->
+      <section id="view-progress" class="view">
+        <div class="panel progress-panel">
+          <div class="progress-header">
+            <div>
+              <p class="eyebrow">Processing spreadsheet</p>
+              <h2>Fetching open-access papers</h2>
+              <p id="progress-file" class="muted"></p>
+            </div>
+            <button id="btn-cancel" type="button" class="btn btn-danger-soft">
+              Stop &amp; Keep Results
+            </button>
+          </div>
+
+          <div class="meter" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <div id="progress-bar" class="meter-fill"></div>
+          </div>
+          <div class="progress-meta">
+            <span id="progress-label">Preparing job…</span>
+            <span id="progress-timing" class="muted"></span>
+            <strong id="progress-percent">0%</strong>
+          </div>
+
+          <div id="current-paper" class="current-card">
+            <span class="current-label">Currently checking</span>
+            <strong id="current-title">Reading rows…</strong>
+            <span id="current-doi" class="mono"></span>
+          </div>
+
+          <div id="live-kpis" class="kpi-grid"></div>
+          <div id="live-breakdown" class="breakdown-row"></div>
+
+          <div class="live-feed-wrap">
+            <div class="live-feed-head">
+              <h3>Recent activity</h3>
+              <span id="live-feed-count" class="muted">0 processed</span>
+            </div>
+            <div class="table-wrap compact-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Title</th>
+                    <th>Status</th>
+                    <th>Reason / File</th>
+                  </tr>
+                </thead>
+                <tbody id="live-feed-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RESULTS VIEW -->
+      <section id="view-results" class="view">
+        <div class="results-head">
+          <div>
+            <p id="results-eyebrow" class="eyebrow">Run complete</p>
+            <h2>Download Summary &amp; Report</h2>
+            <p id="results-subtitle" class="muted"></p>
+          </div>
+          <div class="results-actions">
+            <a id="btn-xlsx" class="btn btn-primary" href="#">Download Excel Report (.xlsx)</a>
+            <a id="btn-zip" class="btn btn-secondary" href="#">Download PDFs (.zip)</a>
+            <a id="btn-report" class="btn btn-ghost" href="#">CSV</a>
+            <button id="btn-new" type="button" class="btn btn-ghost">New upload</button>
+          </div>
+        </div>
+
+        <div id="results-kpis" class="kpi-grid"></div>
+        <div id="results-breakdown" class="breakdown-row"></div>
+
+        <div class="table-toolbar">
+          <div class="filters" role="tablist" aria-label="Filter by status">
+            <button type="button" class="chip is-active" data-filter="all">All <span class="chip-count">0</span></button>
+            <button type="button" class="chip" data-filter="success">Downloaded <span class="chip-count">0</span></button>
+            <button type="button" class="chip" data-filter="not_found">Not Found <span class="chip-count">0</span></button>
+            <button type="button" class="chip" data-filter="no_oa">No OA <span class="chip-count">0</span></button>
+            <button type="button" class="chip" data-filter="blocked">Blocked / Non-PDF <span class="chip-count">0</span></button>
+            <button type="button" class="chip" data-filter="invalid_doi">Missing DOI <span class="chip-count">0</span></button>
+          </div>
+
+          <div class="toolbar-right">
+            <label class="search">
+              <span class="sr-only">Search papers</span>
+              <input id="search-input" type="search" placeholder="Search title, DOI, publisher, reason…" />
+            </label>
+            <label class="page-size-label">
+              <span>Rows</span>
+              <select id="page-size">
+                <option value="25">25</option>
+                <option value="50" selected>50</option>
+                <option value="100">100</option>
+                <option value="250">250</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table id="results-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Title &amp; Publisher</th>
+                <th>DOI / Link</th>
+                <th>Outcome</th>
+                <th>Folder</th>
+                <th>Reason / Saved File</th>
+              </tr>
+            </thead>
+            <tbody id="results-body"></tbody>
+          </table>
+        </div>
+
+        <div id="pagination" class="pagination" hidden>
+          <span id="page-info" class="muted"></span>
+          <div class="page-controls">
+            <button id="page-prev" type="button" class="btn btn-secondary btn-sm">Previous</button>
+            <button id="page-next" type="button" class="btn btn-secondary btn-sm">Next</button>
+          </div>
+        </div>
+
+        <p id="empty-filter" class="empty-filter" hidden>No papers match this filter.</p>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>
+        Downloads legal open-access PDFs only — never bypasses paywalls, CAPTCHAs, or publisher access controls.
+      </p>
+    </footer>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,11 @@
+paper_number,title,doi,source,reason,error
+180,An Enhanced Skin Cancer Detection using Medical Transformers,,Scopus,invalid_doi,No reliable DOI found from the supplied DOI field or title.
+236,AI Powered Tele dermatologist and Bridging Gap in Remote Health Care,,Scopus,invalid_doi,No reliable DOI found from the supplied DOI field or title.
+249,Explaining Explainability: Recommendations for Effective Use of Concept Activation Vectors,,Scopus,invalid_doi,No reliable DOI found from the supplied DOI field or title.
+308,Application of Deep Learning general-purpose neural architectures based on Vision Transformers for ISIC melanoma classification,,Google Scholar extract,invalid_doi,No reliable DOI found from the supplied DOI field or title.
+310,Towards explainable skin cancer classification: A dual-network attention model with lesion segmentation and clinical metadata fusion,,Google Scholar extract,invalid_doi,No reliable DOI found from the supplied DOI field or title.
+312,Comparative Analysis of Vision Transformers and CNNs in Melanoma Classification,,Google Scholar extract,invalid_doi,No reliable DOI found from the supplied DOI field or title.
+318,A New Approach for the Diagnosis of Skin Cancer by Using Convolutional Neural Networks and Dermoscopic Images,,Google Scholar extract,invalid_doi,No reliable DOI found from the supplied DOI field or title.
+323,Efficient and explainable skin lesion classification: a single ConvNeXt-Large surpassing ConvNeXt ensembles with Grad-CAM,,Google Scholar extract,invalid_doi,No reliable DOI found from the supplied DOI field or title.
+333,A Comparative Evaluation of Pre-trained Convolutional Neural Networks for Melanoma Detection,,Google Scholar extract,invalid_doi,No reliable DOI found from the supplied DOI field or title.
+345,MelanomaNet: Explainable Deep Learning for Skin Lesion Classification,,Google Scholar extract,invalid_doi,No reliable DOI found from the supplied DOI field or title.
